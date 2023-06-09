@@ -234,7 +234,15 @@ const buffer_to_base64 = (buffer) => {
  * @returns {string} The string representation.
  */
 const buffer_to_string = (buffer, encoding) => {
-	return new TextDecoder(encoding || 'utf-8').decode(buffer);
+	if (typeof TextDecoder !== 'undefined') {
+		return new TextDecoder(encoding || 'utf-8').decode(buffer);
+	} else {
+		let output = '';
+		new Uint8Array(buffer).forEach((byte) => {
+			output += String.fromCodePoint(byte);
+		});
+		return output;
+	}
 };
 
 /*
@@ -401,7 +409,15 @@ const base64_to_string = (base64) => {
  * @returns {ArrayBuffer} The ArrayBuffer representation.
  */
 const string_to_buffer = (string) => {
-	return new TextEncoder().encode(string).buffer;
+	if (typeof TextEncoder !== 'undefined') {
+		return new TextEncoder().encode(string).buffer;
+	} else {
+		const array = [];
+		for (let i = 0; i < string.length; ++i) {
+			array.push(string.codePointAt(i) || 0);
+		}
+		return array_to_buffer(array);
+	}
 };
 
 /**
